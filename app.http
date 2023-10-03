@@ -1,0 +1,34 @@
+###
+GET http://localhost:8081/employee
+
+
+###
+POST http://localhost:8081/employee/add
+Content-Type: application/json
+
+{
+  "emp_id": "1",
+  "first_name": "KEKA",
+  "last_name": "KEKA",
+  "dob": "1990-01-14",
+  "mobile": "1234567890",
+  "personnel_mail": "john.doe@example.com",
+  "address": "123 Main St",
+  "additional_info": "Additional info 1",
+  "department": "HR",
+  "role": "Manager",
+  "appointed_date": "2023-09-14",
+  "salary": 55000.00, 
+  "branch": "Head Office",
+  "supervisor": "Jane Supervisor"
+}
+
+###
+GET http://localhost:8081/employee/get/KEka
+
+
+###
+DELETE  http://localhost:8081/employee/delete/KEka
+
+
+

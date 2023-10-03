@@ -1,0 +1,162 @@
+
+
+
+CREATE TABLE Customer (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id VARCHAR(20) NOT NULL,
+    reporting_name VARCHAR(100) NOT NULL,
+    reporting_address TEXT,
+    billing_name VARCHAR(100) NOT NULL,
+    billing_address TEXT,
+    email VARCHAR(100),
+    contact VARCHAR(15),
+    gst_number VARCHAR(20),
+    pan_number VARCHAR(20),
+    work_order VARCHAR(100)
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ALTER USER 'your_user'@'localhost' IDENTIFIED WITH 'mysql_native_password' BY 'your_password';
+ALTER USER 'root'@'localhost' IDENTIFIED WITH 'mysql_native_password' BY 'keka@3061';
+
+CREATE TABLE customers(
+  id BIGSERIAL NOT NULL PRIMARY KEY,
+  reporting_name varchar(100),
+  reporting_address varchar(200),
+  email varchar(100),
+  mobile numeric CHECK (mobile::text ~ '^[0-9]{10}$' OR mobile IS NULL),
+  gst_number varchar(50),
+  pan_number varchar(50),
+  billing_name varchar(100),
+  billing_address varchar(200),
+  work_order varchar(200)
+);
+
+CREATE TABLE Employee (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    emp_id VARCHAR(20) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    dob DATE NOT NULL,
+    mobile VARCHAR(15),
+    personnel_mail VARCHAR(100),
+    address TEXT,
+    additional_info TEXT,
+    department VARCHAR(50),
+    role VARCHAR(50),
+    appointed_date DATE,
+    salary DECIMAL(10, 2),
+    branch VARCHAR(50),
+    supervisor VARCHAR(50)
+);
+
+
+ALTER TABLE Employee
+ADD COLUMN ssc_certificate VARCHAR(255),
+ADD COLUMN intermediate_certificate VARCHAR(255),
+ADD COLUMN degree_certificate VARCHAR(255),
+ADD COLUMN adhar VARCHAR(255),
+ADD COLUMN pan VARCHAR(255),
+ADD COLUMN bank_account VARCHAR(255),
+ADD COLUMN appointment_letter VARCHAR(255);
+
+
+
+CREATE TABLE Employee (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    emp_id VARCHAR(20) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    dob DATE NOT NULL,
+    mobile VARCHAR(15),
+    personnel_mail VARCHAR(100),
+    address TEXT,
+    additional_info TEXT,
+    department VARCHAR(50),
+    role VARCHAR(50),
+    appointed_date DATE,
+    salary DECIMAL(10, 2),
+    branch VARCHAR(50),
+    supervisor VARCHAR(50),
+    ssc_certificate VARCHAR(255),
+    intermediate_certificate VARCHAR(255),
+    degree_certificate VARCHAR(255),
+    adhar VARCHAR(255),
+    pan VARCHAR(255),
+    bank_account VARCHAR(255),
+    appointment_letter VARCHAR(255),
+    profile_image VARCHAR(255)
+	
+);
+
+
+-- Insert 20 random dummy records into the "Employee" table
+INSERT INTO Employee (emp_id, first_name, last_name, dob, mobile, personnel_mail, address, additional_info, department, role, appointed_date, salary, branch, supervisor)
+VALUES
+    ('E001', 'John', 'Doe', '1990-01-15', '1234567890', 'john.doe@example.com', '123 Main St', 'Additional info 1', 'HR', 'Manager', '2023-09-15', 55000.00, 'Head Office', 'Jane Supervisor'),
+    ('E002', 'Jane', 'Smith', '1985-05-20', '9876543210', 'jane.smith@example.com', '456 Elm St', 'Additional info 2', 'IT', 'Developer', '2023-09-15', 60000.00, 'Tech Center', 'John Manager'),
+    ('E003', 'Robert', 'Johnson', '1982-03-10', '5555555555', 'robert.j@example.com', '789 Oak St', 'Additional info 3', 'Finance', 'Accountant', '2023-09-15', 48000.00, 'Finance Office', 'Amy Supervisor'),
+    ('E004', 'Sarah', 'Wilson', '1993-07-05', '1112223333', 'sarah.w@example.com', '321 Birch St', 'Additional info 4', 'Sales', 'Salesperson', '2023-09-15', 52000.00, 'Sales Office', 'Michael Manager'),
+    ('E005', 'David', 'Brown', '1988-12-18', '4443332222', 'david.b@example.com', '567 Cedar St', 'Additional info 5', 'Marketing', 'Marketing Specialist', '2023-09-15', 58000.00, 'Marketing Office', 'Susan Supervisor'),
+    ('E006', 'Emily', 'Davis', '1995-11-28', '9998887777', 'emily.d@example.com', '101 Pine St', 'Additional info 6', 'HR', 'HR Assistant', '2023-09-15', 48000.00, 'Head Office', 'Jane Supervisor'),
+    ('E007', 'Michael', 'Johnson', '1983-09-02', '7776665555', 'michael.j@example.com', '222 Oak St', 'Additional info 7', 'IT', 'Database Administrator', '2023-09-15', 65000.00, 'Tech Center', 'John Manager'),
+    ('E008', 'Olivia', 'Miller', '1992-04-12', '5557774444', 'olivia.m@example.com', '654 Elm St', 'Additional info 8', 'Finance', 'Financial Analyst', '2023-09-15', 52000.00, 'Finance Office', 'Amy Supervisor'),
+    ('E009', 'Ethan', 'Garcia', '1997-06-21', '1239874560', 'ethan.g@example.com', '777 Maple St', 'Additional info 9', 'Sales', 'Sales Manager', '2023-09-15', 75000.00, 'Sales Office', 'Michael Manager'),
+    ('E010', 'Sophia', 'Anderson', '1991-10-03', '8889990000', 'sophia.a@example.com', '987 Birch St', 'Additional info 10', 'Marketing', 'Marketing Manager', '2023-09-15', 68000.00, 'Marketing Office', 'Susan Supervisor'),
+    ('E011', 'Liam', 'Wilson', '1987-08-07', '3332221111', 'liam.w@example.com', '444 Cedar St', 'Additional info 11', 'HR', 'HR Manager', '2023-09-15', 72000.00, 'Head Office', 'Jane Supervisor'),
+    ('E012', 'Ava', 'Smith', '1994-03-25', '9993337777', 'ava.s@example.com', '555 Oak St', 'Additional info 12', 'IT', 'Software Engineer', '2023-09-15', 62000.00, 'Tech Center', 'John Manager'),
+    ('E013', 'Noah', 'Davis', '1989-02-14', '2226667777', 'noah.d@example.com', '333 Elm St', 'Additional info 13', 'Finance', 'Financial Analyst', '2023-09-15', 54000.00, 'Finance Office', 'Amy Supervisor'),
+    ('E014', 'Emma', 'Johnson', '1996-01-08', '4445556666', 'emma.j@example.com', '111 Pine St', 'Additional info 14', 'Sales', 'Salesperson', '2023-09-15', 53000.00, 'Sales Office', 'Michael Manager'),
+    ('E015', 'Mason', 'Miller', '1986-06-13', '5554443333', 'mason.m@example.com', '888 Birch St', 'Additional info 15', 'Marketing', 'Marketing Specialist', '2023-09-15', 57000.00, 'Marketing Office', 'Susan Supervisor'),
+    ('E016', 'Isabella', 'Harris', '1990-09-30', '7778889999', 'isabella.h@example.com', '555 Cedar St', 'Additional info 16', 'HR', 'HR Assistant', '2023-09-15', 49000.00, 'Head Office', 'Jane Supervisor'),
+    ('E017', 'Liam', 'Garcia', '1998-07-17', '1234567890', 'liam.g@example.com', '777 Oak St', 'Additional info 17', 'IT', 'Database Administrator', '2023-09-15', 67000.00, 'Tech Center', 'John Manager'),
+    ('E018', 'Olivia', 'Anderson', '1993-04-28', '5556667777', 'olivia.a@example.com', '333 Elm St', 'Additional info 18', 'Finance', 'Financial Analyst', '2023-09-15', 51000.00, 'Finance Office', 'Amy Supervisor'),
+    ('E019', 'Ethan', 'Davis', '1994-10-12', '9876543210', 'ethan.d@example.com', '222 Birch St', 'Additional info 19', 'Sales', 'Sales Manager', '2023-09-15', 72000.00, 'Sales Office', 'Michael Manager'),
+    ('E020', 'Sophia', 'Smith', '1996-12-04', '5555555555', 'sophia.s@example.com', '444 Cedar St', 'Additional info 20', 'Marketing', 'Marketing Manager', '2023-09-15', 68000.00, 'Marketing Office', 'Susan Supervisor')
+
+
+
+
+
+
+
+INSERT INTO Employee (emp_id, first_name, last_name, dob, mobile, personnel_mail, address, additional_info, department, role, appointed_date, salary, branch, supervisor)
+VALUES
+    ('E021', 'William', 'Martinez', '1991-02-19', '7778889999', 'william.m@example.com', '123 Oak St', 'Additional info 21', 'IT', 'Software Engineer', '2023-09-15', 62000.00, 'Tech Center', 'John Manager'),
+    ('E022', 'Sophia', 'Garcia', '1994-06-30', '5554443333', 'sophia.g@example.com', '789 Elm St', 'Additional info 22', 'Finance', 'Financial Analyst', '2023-09-15', 54000.00, 'Finance Office', 'Amy Supervisor'),
+    ('E023', 'Benjamin', 'Robinson', '1988-09-08', '4445556666', 'benjamin.r@example.com', '987 Birch St', 'Additional info 23', 'Sales', 'Salesperson', '2023-09-15', 53000.00, 'Sales Office', 'Michael Manager'),
+    ('E024', 'Olivia', 'Brown', '1993-03-15', '5556667777', 'olivia.b@example.com', '456 Cedar St', 'Additional info 24', 'Marketing', 'Marketing Specialist', '2023-09-15', 57000.00, 'Marketing Office', 'Susan Supervisor'),
+    ('E025', 'James', 'Hernandez', '1992-05-22', '1239874560', 'james.h@example.com', '101 Elm St', 'Additional info 25', 'HR', 'HR Assistant', '2023-09-15', 49000.00, 'Head Office', 'Jane Supervisor'),
+    ('E026', 'Elizabeth', 'Thompson', '1997-10-07', '5557774444', 'elizabeth.t@example.com', '789 Oak St', 'Additional info 26', 'IT', 'Database Administrator', '2023-09-15', 67000.00, 'Tech Center', 'John Manager'),
+    ('E027', 'Michael', 'Gonzalez', '1989-12-12', '2226667777', 'michael.g@example.com', '333 Maple St', 'Additional info 27', 'Finance', 'Financial Analyst', '2023-09-15', 51000.00, 'Finance Office', 'Amy Supervisor'),
+    ('E028', 'Ava', 'Rodriguez', '1994-01-25', '4443332222', 'ava.r@example.com', '456 Oak St', 'Additional info 28', 'Sales', 'Sales Manager', '2023-09-15', 72000.00, 'Sales Office', 'Michael Manager'),
+    ('E029', 'Noah', 'Perez', '1996-04-03', '9998887777', 'noah.p@example.com', '567 Cedar St', 'Additional info 29', 'Marketing', 'Marketing Manager', '2023-09-15', 68000.00, 'Marketing Office', 'Susan Supervisor'),
+    ('E030', 'Oliver', 'Lopez', '1990-08-20', '7776665555', 'oliver.l@example.com', '222 Pine St', 'Additional info 30', 'HR', 'HR Manager', '2023-09-15', 72000.00, 'Head Office', 'Jane Supervisor'),
+    ('E031', 'Chloe', 'Lee', '1998-11-01', '3332221111', 'chloe.l@example.com', '987 Oak St', 'Additional info 31', 'IT', 'Software Engineer', '2023-09-15', 62000.00, 'Tech Center', 'John Manager'),
+    ('E032', 'Henry', 'Wright', '1993-07-12', '9993337777', 'henry.w@example.com', '101 Birch St', 'Additional info 32', 'Finance', 'Financial Analyst', '2023-09-15', 54000.00, 'Finance Office', 'Amy Supervisor'),
+    ('E033', 'Grace', 'Taylor', '1992-09-24', '5555555555', 'grace.t@example.com', '444 Cedar St', 'Additional info 33', 'Sales', 'Salesperson', '2023-09-15', 53000.00, 'Sales Office', 'Michael Manager'),
+    ('E034', 'Liam', 'Harris', '1991-06-29', '5554443333', 'liam.h@example.com', '777 Elm St', 'Additional info 34', 'Marketing', 'Marketing Specialist', '2023-09-15', 57000.00, 'Marketing Office', 'Susan Supervisor'),
+    ('E035', 'Sophia', 'King', '1988-04-18', '9876543210', 'sophia.k@example.com', '123 Oak St', 'Additional info 35', 'HR', 'HR Assistant', '2023-09-15', 49000.00, 'Head Office', 'Jane Supervisor'),
+    ('E036', 'William', 'Walker', '1997-05-14', '4445556666', 'william.w@example.com', '333 Maple St', 'Additional info 36', 'IT', 'Database Administrator', '2023-09-15', 67000.00, 'Tech Center', 'John Manager'),
+    ('E037', 'Olivia', 'Baker', '1996-12-06', '5556667777', 'olivia.b@example.com', '456 Oak St', 'Additional info 37', 'Finance', 'Financial Analyst', '2023-09-15', 51000.00, 'Finance Office', 'Amy Supervisor'),
+    ('E038', 'James', 'Lewis', '1989-11-03', '1239874560', 'james.l@example.com', '567 Cedar St', 'Additional info 38', 'Sales', 'Sales Manager', '2023-09-15', 72000.00, 'Sales Office', 'Michael Manager'),
+    ('E039', 'Elizabeth', 'Young', '1994-09-28', '9998887777', 'elizabeth.y@example.com', '222 Pine St', 'Additional info 39', 'Marketing', 'Marketing Manager', '2023-09-15', 68000.00, 'Marketing Office', 'Susan Supervisor')
