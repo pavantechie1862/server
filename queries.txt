@@ -1,4 +1,162 @@
 
+CREATE TABLE Test (
+    id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    test_name VARCHAR(250) NOT NULL,
+    requirements TEXT,
+    price INT,
+    method VARCHAR(50),
+    discipline VARCHAR(20),
+    nabl_status BOOLEAN,
+    units VARCHAR(50),
+    additional_info TEXT, 
+    sub_group INT,
+    FOREIGN KEY (sub_group) REFERENCES material(id)
+);
+
+
+
+
+
+
+
+CREATE TABLE material (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(200),
+    prefix VARCHAR(100),
+    is_code VARCHAR(100),
+    additional_info TEXT,
+    group_id  VARCHAR(100) NOT NULL,
+    FOREIGN KEY (group_id) REFERENCES material_groups(id)
+);
+
+
+CREATE TABLE material (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  prefix VARCHAR(10) NOT NULL,
+  is_code VARCHAR(20), 
+  material_group_id VARCHAR(20),
+  FOREIGN KEY (material_group_id) REFERENCES material_groups(id) 
+);
+
+INSERT INTO material (name, prefix, is_code, material_group_id)
+VALUES
+  ('Bitumen Mix Design - SDBC', 'Bit', NULL, 'GROUP-006'),
+  ('Bitumen VG-10', 'Bit', NULL, 'GROUP-006'),
+  ('Bitumen VG-20', 'Bit', NULL, 'GROUP-006'),
+  ('Bitumen VG-30', 'Bit', NULL, 'GROUP-006'),
+  ('Bitumen VG-40', 'Bit', NULL, 'GROUP-006'),
+  ('Bump Integrator', 'Bum', NULL, 'GROUP-001'),
+  ('Burnt Clay Bricks', 'BCB', NULL, 'GROUP-001'),
+  ('CRMB', 'CRMB', NULL, 'GROUP-001'),
+  ('CTB', 'WMM', NULL, 'GROUP-001'),
+  ('Cement - OPC 43G', 'Cem', 'IS: 3812 : 2013', 'GROUP-001'),
+  ('Cement - OPC 53G', 'Cem', 'IS: 269 - 2015', 'GROUP-001'),
+  ('Cement - PPC', 'Cem', NULL, 'GROUP-001'),
+  ('Cement - PSC', 'Cem', NULL, 'GROUP-001'),
+  ('Cement - SRPC', 'Cem', NULL, 'GROUP-001'),
+  ('Coal', 'Coa', NULL, 'GROUP-002'),
+  ('Coarse Aggregates', 'CA', NULL, 'GROUP-001'),
+  ('Concrete Beams', 'Con', NULL, 'GROUP-001'),
+  ('Concrete Cubes', 'Con', NULL, 'GROUP-001'),
+  ('Concrete Mix Design', 'CMD', NULL, 'GROUP-001'),
+  ('Concrete cores', 'Con', NULL, 'GROUP-001'),
+  ('Construction Water', 'CW', NULL, 'GROUP-003'),
+  ('Couplers', 'Cou', NULL, 'GROUP-001'),
+  ('Cover Blocks', 'CB', NULL, 'GROUP-001'),
+  ('Crash Barrier', 'Car', NULL, 'GROUP-001'),
+  ('Curing Compound', 'CC', NULL, 'GROUP-001'),
+  ('Dolomite', 'Ls', NULL, 'GROUP-005'),
+  ('Drinking Water', 'DW', NULL, 'GROUP-003'),
+  ('Dura Board', 'DB', NULL, 'GROUP-001'),
+  ('Falling Weight Deflection', 'Fal', NULL, 'GROUP-001'),
+  ('Fine Aggregates', 'FA', NULL, 'GROUP-001'),
+  ('Flush Doors', 'Flu', NULL, 'GROUP-001'),
+  ('Fly Ash', 'Fly', NULL, 'GROUP-002'),
+  ('Fly Ash Bricks', 'FAB', NULL, 'GROUP-001'),
+  ('GGBS', 'GG', 'IS: 12089 - 1987(RA 2008)', 'GROUP-001'),
+  ('GSB', 'GSB', NULL, 'GROUP-001'),
+  ('Geotechnical', 'Geotechnical', NULL, 'GROUP-006'),
+  ('Glass Beads', 'GB', NULL, 'GROUP-001'),
+  ('Gypsum', 'GY', NULL, 'GROUP-001'),
+  ('Gypsum Boards', 'GY', NULL, 'GROUP-001'),
+  ('HT Strands', 'HT', NULL, 'GROUP-001'),
+  ('Hardened Concrete', 'HC', NULL, 'GROUP-001'),
+  ('Hollow Concrete Blocks', 'HCB', NULL, 'GROUP-001'),
+  ('Limestone', 'Ls', NULL, 'GROUP-005'),
+  ('Mix Design-Soil', 'Max', NULL, 'GROUP-001'),
+  ('NDT - Concrete', 'NDT', NULL, 'GROUP-001'),
+  ('Paver Blocks', 'Pav', NULL, 'GROUP-001'),
+  ('Plywood', 'Ply', NULL, 'GROUP-001'),
+  ('Polythene Sheet', 'PS', NULL, 'GROUP-001'),
+  ('Reinforcement Steel', 'RS', NULL, 'GROUP-001'),
+  ('Reinforcement Steel - Fe-500', 'RS Fe-550', NULL, 'GROUP-001'),
+  ('Reinforcement Steel - Fe-500D', 'RS Fe-500D', NULL, 'GROUP-001'),
+  ('Reinforcement Steel - Fe-550', 'RS Fe-550', NULL, 'GROUP-001'),
+  ('Reinforcement Steel - Fe-550D', 'RS Fe-550D', NULL, 'GROUP-001'),
+  ('Road Marking', 'Roa', NULL, 'GROUP-001'),
+  ('Rock', 'Roc', NULL, 'GROUP-005'),
+  ('SHM', 'SHM', NULL, 'GROUP-001'),
+  ('SS Pipes', 'SS', NULL, 'GROUP-001'),
+  ('STP Water', 'STP', NULL, 'GROUP-001'),
+  ('Separation Memberane', 'Sep', NULL, 'GROUP-001'),
+  ('Shimpads', 'Shi', NULL, 'GROUP-001'),
+  ('Silica Fume', 'SF', NULL, 'GROUP-001'),
+  ('Soil', 'So', NULL, 'GROUP-001'),
+  ('Solid Concrete Blocks', 'SCD', NULL, 'GROUP-001'),
+  ('Structural Steel', 'SS', NULL, 'GROUP-001'),
+  ('Survey', 'Survey', NULL, 'GROUP-001'),
+  ('Swimming Pool Water', 'SPW', NULL, 'GROUP-003'),
+  ('Thermo Plastics', 'TP', NULL, 'GROUP-001'),
+  ('Tiles', 'Til', NULL, 'GROUP-001'),
+  ('Timber', 'Tim', NULL, 'GROUP-001'),
+  ('WMM', 'WMM', NULL, 'GROUP-001'),
+  ('Water - Microbiology', 'WMB', NULL, 'GROUP-003'),
+  ('Wood', 'Wo', NULL, 'GROUP-001');
+
+
+
+
+
+
+
+
+
+CREATE TABLE material_groups (
+  id VARCHAR(20) NOT NULL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  additional_info TEXT
+);
+
+
+
+DELIMITER //
+
+CREATE TRIGGER `before_insert_material_groups` BEFORE INSERT ON `material_groups` FOR EACH ROW
+BEGIN
+  DECLARE next_serial INT;
+  SET next_serial = (SELECT IFNULL(MAX(CAST(SUBSTRING(id, 15) AS SIGNED)), 0) + 1 FROM material_groups);
+  SET NEW.id = CONCAT('GROUP-', LPAD(next_serial, 3, '0'));
+END;
+//
+
+DELIMITER ;
+
+
+
+
+INSERT INTO material_groups (name, additional_info) VALUES ('Building Materials', 'Suppliers of various construction materials.');
+INSERT INTO material_groups (name, additional_info) VALUES ('Solid Fuels', 'Suppliers of coal, wood, and other solid fuels.');
+INSERT INTO material_groups (name, additional_info) VALUES ('Water', 'Providers of clean drinking water services.');
+INSERT INTO material_groups (name, additional_info) VALUES ('Building materials - Reinforced structures', 'Suppliers of materials for reinforced concrete structures.');
+INSERT INTO material_groups (name, additional_info) VALUES ('Ores and Minerals', 'Miners and suppliers of ores and minerals.');
+INSERT INTO material_groups (name, additional_info) VALUES ('Soil and Rock', 'Providers of soil and rock excavation services.');
+
+
+
+
+
+
 
 
 CREATE TABLE Customer (
