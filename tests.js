@@ -12,6 +12,7 @@ const pool = createPool({
   connectionLimit: 10,
   database: "lims",
 });
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -29,7 +30,7 @@ router.get("", (req, res) => {
 router.get("/get/:id", (req, res) => {
   const id = req.params.id;
 
-  pool.query(`SELECT * FROM test where id = ${id}`, (err, results) => {
+  pool.query(`SELECT * FROM test where sub_group = ${id}`, (err, results) => {
     if (err) {
       console.error("Error executing SQL query:", err);
       res.status(500).json({ error: "Internal server error" });
@@ -40,31 +41,29 @@ router.get("/get/:id", (req, res) => {
 });
 
 router.post("/add", upload.none(), (req, res) => {
-  console.log(req.body);
-
   const {
     test_name,
-    requirements,
+    requirements = null,
     price,
     method,
     discipline,
     nabl_status,
-    units,
+    units = null,
     sub_group,
     additional_info,
   } = req.body;
 
   pool.query(
-    "INSERT INTO test (test_name, requirements,price,method,discipline,nabl_status,units,sub_group,additional_info) VALUES (?, ?,?,?)",
+    "INSERT INTO test (test_name, requirements,price,method,discipline,nabl_status,units,sub_group,additional_info) VALUES (?, ?,?,?,?, ?,?,?,?)",
     [
       test_name,
       requirements,
-      price,
+      parseInt(price),
       method,
       discipline,
-      nabl_status,
+      JSON.parse(nabl_status),
       units,
-      sub_group,
+      parseInt(sub_group),
       additional_info,
     ],
     (err, result) => {

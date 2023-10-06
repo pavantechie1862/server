@@ -21,6 +21,7 @@ router.get("", (req, res) => {
       console.error("Error executing SQL query:", err);
       res.status(500).json({ error: "Internal server error" });
     } else {
+      console.log(results);
       res.status(200).json(results);
     }
   });

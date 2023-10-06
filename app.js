@@ -10,11 +10,13 @@ const employeeRoutes = require("./employee");
 const customerRoutes = require("./customer");
 const groups = require("./materialGroups");
 const subgroup = require("./subGroup");
+const test = require("./tests");
 
 app.use("/employee", employeeRoutes);
 app.use("/customer", customerRoutes);
 app.use("/group", groups);
 app.use("/subgroup", subgroup);
+app.use("/test", test);
 
 app.listen(8081, () => {
   console.log("Server started on port 8081");

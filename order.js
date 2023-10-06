@@ -16,16 +16,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 function checkRequiredFiles(request, res) {
-  const requiredFiles = [
-    "profile_image",
-    "adhar",
-    "pan",
-    "bank_account",
-    "appointment_letter",
-    "ssc_certificate",
-    "intermediate_certificate",
-    "degree_certificate",
-  ];
+  const requiredFiles = ["letter"];
 
   for (const file of requiredFiles) {
     if (!request.files || !request.files[file]) {
@@ -59,7 +50,6 @@ router.post("/add", employeeDocuments, (request, res) => {
   const ssc_certificate = request.files["ssc_certificate"][0];
   const intermediate_certificate = request.files["intermediate_certificate"][0];
   const degree_certificate = request.files["degree_certificate"][0];
-  // const  {emp_id} = req.body
 
   const emp_id = request.body.emp_id;
   const first_name = request.body.first_name;
@@ -80,7 +70,6 @@ router.post("/add", employeeDocuments, (request, res) => {
   if (!fs.existsSync(uploadDestination)) {
     fs.mkdirSync(uploadDestination, { recursive: true });
   }
-
   const saveFileAndReturnRelativePath = (file, fieldName, emp_id) => {
     if (!file) {
       return null;
