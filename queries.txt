@@ -55,7 +55,7 @@ VALUES
   ('Cement - PPC', 'Cem', NULL, 'GROUP-001'),
   ('Cement - PSC', 'Cem', NULL, 'GROUP-001'),
   ('Cement - SRPC', 'Cem', NULL, 'GROUP-001'),
-  ('Coal', 'Coa', NULL, 'GROUP-002'),
+  ('Coal', 'Coa', NULL, 'GROUP-002'),0
   ('Coarse Aggregates', 'CA', NULL, 'GROUP-001'),
   ('Concrete Beams', 'Con', NULL, 'GROUP-001'),
   ('Concrete Cubes', 'Con', NULL, 'GROUP-001'),
@@ -129,9 +129,7 @@ CREATE TABLE material_groups (
 );
 
 
-
 DELIMITER //
-
 CREATE TRIGGER `before_insert_material_groups` BEFORE INSERT ON `material_groups` FOR EACH ROW
 BEGIN
   DECLARE next_serial INT;
@@ -139,11 +137,7 @@ BEGIN
   SET NEW.id = CONCAT('GROUP-', LPAD(next_serial, 3, '0'));
 END;
 //
-
 DELIMITER ;
-
-
-
 
 INSERT INTO material_groups (name, additional_info) VALUES ('Building Materials', 'Suppliers of various construction materials.');
 INSERT INTO material_groups (name, additional_info) VALUES ('Solid Fuels', 'Suppliers of coal, wood, and other solid fuels.');
@@ -318,3 +312,39 @@ VALUES
     ('E037', 'Olivia', 'Baker', '1996-12-06', '5556667777', 'olivia.b@example.com', '456 Oak St', 'Additional info 37', 'Finance', 'Financial Analyst', '2023-09-15', 51000.00, 'Finance Office', 'Amy Supervisor'),
     ('E038', 'James', 'Lewis', '1989-11-03', '1239874560', 'james.l@example.com', '567 Cedar St', 'Additional info 38', 'Sales', 'Sales Manager', '2023-09-15', 72000.00, 'Sales Office', 'Michael Manager'),
     ('E039', 'Elizabeth', 'Young', '1994-09-28', '9998887777', 'elizabeth.y@example.com', '222 Pine St', 'Additional info 39', 'Marketing', 'Marketing Manager', '2023-09-15', 68000.00, 'Marketing Office', 'Susan Supervisor')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE TABLE orders (
+  order_id varchar(50) NOT NULL PRIMARY KEY,
+    project_name VARCHAR(400),
+    customer_details VARCHAR(500),
+    customer_reference VARCHAR(500),
+    parent_reference VARCHAR(500),
+    subject VARCHAR(300),
+    letter VARCHAR(500),
+    material_test_details JSON,
+    discount VARCHAR(100),
+    transport_fee VARCHAR(100),
+    due_date DATE,
+    additional_info TEXT,
+    customer_id INT,
+    FOREIGN KEY (customer_id) REFERENCES customer(id)
+);
+

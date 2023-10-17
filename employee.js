@@ -51,6 +51,8 @@ router.post("/add", employeeDocuments, (request, res) => {
   if (!checkRequiredFiles(request, res)) {
     return res.status(400).json({ error_msg: "One or more files are missing" });
   }
+  console.log("after function");
+
   const profile_image = request.files["profile_image"][0];
   const adhar = request.files["adhar"][0];
   const pan = request.files["pan"][0];
@@ -103,6 +105,7 @@ router.post("/add", employeeDocuments, (request, res) => {
         console.error(`Error saving ${fieldName} File:`, err);
       }
     });
+    console.log(relativePath);
 
     return relativePath;
   };
@@ -357,59 +360,6 @@ router.get("", (req, res) => {
     }
   });
 });
-
-//to add an  employee
-// router.post("/add", (request, response) => {
-//   console.log("api is triggered");
-//   const newEmployee = request.body;
-//   console.log(newEmployee);
-//   try {
-//     const createEmployeeQuery = `
-//           INSERT INTO Employee (
-//             emp_id,
-//             first_name,
-//             last_name,
-//             dob,
-//             mobile,
-//             personnel_mail,
-//             address,
-//             additional_info,
-//             department,
-//             role,
-//             appointed_date,
-//             salary,
-//             branch,
-//             supervisor
-//           ) VALUES (
-//             '${newEmployee.emp_id}',
-//             '${newEmployee.first_name}',
-//             '${newEmployee.last_name}',
-//             '${newEmployee.dob}',
-//             '${newEmployee.mobile}',
-//             '${newEmployee.personnel_mail}',
-//             '${newEmployee.address}',
-//             '${newEmployee.additional_info}',
-//             '${newEmployee.department}',
-//             '${newEmployee.role}',
-//             '${newEmployee.appointed_date}',
-//             '${newEmployee.salary}',
-//             '${newEmployee.branch}',
-//             '${newEmployee.supervisor}'
-//           )`;
-
-//     pool.query(createEmployeeQuery, (err, result) => {
-//       if (err) {
-//         console.error("Error adding employee:", err);
-//         response.status(500).send({ error_msg: "Internal server error" });
-//       } else {
-//         response.status(200).send({ message: "Employee added successfully" });
-//       }
-//     });
-//   } catch (error) {
-//     console.error("Error adding employee:", error);
-//     response.status(500).send({ error_msg: "Internal server error" });
-//   }
-// });
 
 //get single employee record
 router.get("/get/:id", (req, res) => {

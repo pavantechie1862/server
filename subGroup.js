@@ -21,7 +21,6 @@ router.get("", (req, res) => {
       console.error("Error executing SQL query:", err);
       res.status(500).json({ error: "Internal server error" });
     } else {
-      console.log(results);
       res.status(200).json(results);
     }
   });
@@ -41,8 +40,6 @@ router.get("/get/:id", (req, res) => {
 });
 
 router.post("/add", upload.none(), (req, res) => {
-  console.log(req.body);
-
   const { name, prefix, additional_info, group_id } = req.body;
 
   pool.query(
