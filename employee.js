@@ -51,7 +51,6 @@ router.post("/add", employeeDocuments, (request, res) => {
   if (!checkRequiredFiles(request, res)) {
     return res.status(400).json({ error_msg: "One or more files are missing" });
   }
-  console.log("after function");
 
   const profile_image = request.files["profile_image"][0];
   const adhar = request.files["adhar"][0];
@@ -61,7 +60,6 @@ router.post("/add", employeeDocuments, (request, res) => {
   const ssc_certificate = request.files["ssc_certificate"][0];
   const intermediate_certificate = request.files["intermediate_certificate"][0];
   const degree_certificate = request.files["degree_certificate"][0];
-  // const  {emp_id} = req.body
 
   const emp_id = request.body.emp_id;
   const first_name = request.body.first_name;
@@ -87,13 +85,13 @@ router.post("/add", employeeDocuments, (request, res) => {
     if (!file) {
       return null;
     }
+    const baseDirectory = "public/employee";
 
     const originalname = file.originalname;
-    const newFileName = `${fieldName}-${emp_id}${path.extname(originalname)}`;
-    const relativePath = `/public/employee/${emp_id}/${newFileName}`;
+    const newFileName = `${fieldName}_${emp_id}${path.extname(originalname)}`;
+    const relativePath = `/${baseDirectory}/${emp_id}/${newFileName}`;
 
-    const baseDirectory = "C:/Users/HP/Desktop/server/public/employee";
-    const empDirectory = path.join(baseDirectory, emp_id);
+    const empDirectory = path.join(__dirname, baseDirectory, emp_id);
     const absolutePath = path.join(empDirectory, newFileName);
 
     if (!fs.existsSync(empDirectory)) {
@@ -105,7 +103,6 @@ router.post("/add", employeeDocuments, (request, res) => {
         console.error(`Error saving ${fieldName} File:`, err);
       }
     });
-    console.log(relativePath);
 
     return relativePath;
   };
@@ -215,120 +212,110 @@ router.post("/add", employeeDocuments, (request, res) => {
   );
 });
 
-router.put("/update/:id", employeeDocuments, (request, res) => {
+router.put("/update/:id", upload.none(), (request, res) => {
   const emp_id = request.params.id;
-  if (!checkRequiredFiles(request, res)) {
-    return res.status(400).json({ error_msg: "One or more files are missing" });
-  }
+  // if (!checkRequiredFiles(request, res)) {
+  //   return res.status(400).json({ error_msg: "One or more files are missing" });
+  // }
 
-  const empIdFolderPath = path.join(__dirname, "public", "employee", emp_id);
-  fsExtra.remove(empIdFolderPath, (err) => {
-    if (err) {
-      return res
-        .status(500)
-        .json({ error_msg: `Failed to remove the existing data of ${emp_id}` });
-    }
-  });
+  // const empIdFolderPath = path.join(__dirname, "public", "employee", emp_id);
+  // fsExtra.remove(empIdFolderPath, (err) => {
+  //   if (err) {
+  //     return res
+  //       .status(500)
+  //       .json({ error_msg: `Failed to remove the existing data of ${emp_id}` });
+  //   }
+  // });
 
-  const profile_image = request.files["profile_image"][0];
-  const adhar = request.files["adhar"][0];
-  const pan = request.files["pan"][0];
-  const bank_account = request.files["bank_account"][0];
-  const appointment_letter = request.files["appointment_letter"][0];
-  const ssc_certificate = request.files["ssc_certificate"][0];
-  const intermediate_certificate = request.files["intermediate_certificate"][0];
-  const degree_certificate = request.files["degree_certificate"][0];
+  // const profile_image = request.files["profile_image"][0];
+  // const adhar = request.files["adhar"][0];
+  // const pan = request.files["pan"][0];
+  // const bank_account = request.files["bank_account"][0];
+  // const appointment_letter = request.files["appointment_letter"][0];
+  // const ssc_certificate = request.files["ssc_certificate"][0];
+  // const intermediate_certificate = request.files["intermediate_certificate"][0];
+  // const degree_certificate = request.files["degree_certificate"][0];
 
-  const first_name = request.body.first_name;
-  const last_name = request.body.last_name;
-  const dob = request.body.dob;
-  const mobile = request.body.mobile;
-  const personnel_mail = request.body.personnel_mail;
-  const address = request.body.address;
-  const additional_info = request.body.additional_info;
-  const department = request.body.department;
-  const role = request.body.role;
-  const appointed_date = request.body.appointed_date;
-  const salary = request.body.salary;
-  const branch = request.body.branch;
-  const supervisor = request.body.supervisor;
+  const {
+    first_name,
+    last_name,
+    mobile,
+    personnel_mail,
+    address,
+    additional_info,
+    department,
+    role,
+    salary,
+    branch,
+    supervisor,
+  } = request.body;
 
-  const uploadDestination = path.join(__dirname, "public", "employee", emp_id);
-  if (!fs.existsSync(uploadDestination)) {
-    fs.mkdirSync(uploadDestination, { recursive: true });
-  }
+  // const uploadDestination = path.join(__dirname, "public", "employee", emp_id);
+  // if (!fs.existsSync(uploadDestination)) {
+  //   fs.mkdirSync(uploadDestination, { recursive: true });
+  // }
 
-  const renameAndSaveFile = (file, fieldName, emp_id) => {
-    const originalname = file.originalname;
-    const newFileName = `${fieldName}-${emp_id}${path.extname(originalname)}`;
-    const filePath = path.join(uploadDestination, newFileName);
+  // const renameAndSaveFile = (file, fieldName, emp_id) => {
+  //   const originalname = file.originalname;
+  //   const newFileName = `${fieldName}-${emp_id}${path.extname(originalname)}`;
+  //   const filePath = path.join(uploadDestination, newFileName);
 
-    fs.writeFile(filePath, file.buffer, (err) => {
-      if (err) {
-        console.error(`Error saving ${fieldName} File:`, err);
-        return res
-          .status(500)
-          .json({ error_msg: `Error saving ${fieldName} File` });
-      }
-    });
+  //   fs.writeFile(filePath, file.buffer, (err) => {
+  //     if (err) {
+  //       console.error(`Error saving ${fieldName} File:`, err);
+  //       return res
+  //         .status(500)
+  //         .json({ error_msg: `Error saving ${fieldName} File` });
+  //     }
+  //   });
 
-    return filePath;
-  };
+  //   return filePath;
+  // };
 
-  const profileImagePath = renameAndSaveFile(
-    profile_image,
-    "profile_image",
-    emp_id
-  );
-  const adharFilePath = renameAndSaveFile(adhar, "adhar", emp_id);
-  const panFilePath = renameAndSaveFile(pan, "pan", emp_id);
-  const bankAccountFilePath = renameAndSaveFile(
-    bank_account,
-    "bank_account",
-    emp_id
-  );
-  const appointmentFilePath = renameAndSaveFile(
-    appointment_letter,
-    "appointment_letter",
-    emp_id
-  );
-  const sscFilePath = renameAndSaveFile(
-    ssc_certificate,
-    "ssc_certificate",
-    emp_id
-  );
-  const intermediateFilePath = renameAndSaveFile(
-    intermediate_certificate,
-    "intermediate_certificate",
-    emp_id
-  );
-  const degreeFilePath = renameAndSaveFile(
-    degree_certificate,
-    "degree_certificate",
-    emp_id
-  );
+  // const profileImagePath = renameAndSaveFile(
+  //   profile_image,
+  //   "profile_image",
+  //   emp_id
+  // );
+  // const adharFilePath = renameAndSaveFile(adhar, "adhar", emp_id);
+  // const panFilePath = renameAndSaveFile(pan, "pan", emp_id);
+  // const bankAccountFilePath = renameAndSaveFile(
+  //   bank_account,
+  //   "bank_account",
+  //   emp_id
+  // );
+  // const appointmentFilePath = renameAndSaveFile(
+  //   appointment_letter,
+  //   "appointment_letter",
+  //   emp_id
+  // );
+  // const sscFilePath = renameAndSaveFile(
+  //   ssc_certificate,
+  //   "ssc_certificate",
+  //   emp_id
+  // );
+  // const intermediateFilePath = renameAndSaveFile(
+  //   intermediate_certificate,
+  //   "intermediate_certificate",
+  //   emp_id
+  // );
+  // const degreeFilePath = renameAndSaveFile(
+  //   degree_certificate,
+  //   "degree_certificate",
+  //   emp_id
+  // );
 
   const updateEmployeeQuery = `
     UPDATE Employee
     SET
-      profile_image = '${profileImagePath}',
-      adhar = '${adharFilePath}',
-      pan = '${panFilePath}',
-      bank_account = '${bankAccountFilePath}',
-      appointment_letter = '${appointmentFilePath}',
-      ssc_certificate = '${sscFilePath}',
-      intermediate_certificate = '${intermediateFilePath}',
-      degree_certificate = '${degreeFilePath}',
       first_name = '${first_name}',
       last_name = '${last_name}',
-      dob = '${dob}',
       mobile = '${mobile}',
       personnel_mail = '${personnel_mail}',
       address = '${address}',
       additional_info = '${additional_info}',
       department = '${department}',
       role = '${role}',
-      appointed_date = '${appointed_date}',
       salary = '${salary}',
       branch = '${branch}',
       supervisor = '${supervisor}'

@@ -8,6 +8,7 @@ const util = require("util");
 const { PENDING_FOR_REVIEW } = require("./constants");
 
 const router = express.Router();
+
 const pool = createPool({
   user: "root",
   host: "localhost",
@@ -217,92 +218,49 @@ router.get("", (req, res) => {
   });
 });
 
-router.get("/:order_id", (req, res) => {
-  const order_id = req.params.order_id;
-  const orderDetails = {};
+const query = util.promisify(pool.query).bind(pool);
 
-  const sqlQuery = `
-    SELECT o.*, om.*, s.*, mt.*, t.*
-    FROM orders o
-    LEFT JOIN order_material om ON o.order_id = om.order_id
-    LEFT JOIN subgroup s ON om.subgroup = s.id
-    LEFT JOIN material_test mt ON om.sample_id = mt.sample_id
-    LEFT JOIN test t ON mt.test_id = t.id
-    WHERE o.order_id = ?
-  `;
+// Route to get order by ID with material and test details
+router.get("/:orderId", async (req, res) => {
+  const orderId = req.params.orderId;
 
-  pool.getConnection((err, connection) => {
-    if (err) {
-      return res.status(500).json({ error: "Database error" });
+  try {
+    const orderQuery = await query("SELECT * FROM orders WHERE order_id = ?", [
+      orderId,
+    ]);
+
+    if (orderQuery.length === 0) {
+      res.status(404).json({ error: "Order not found" });
+      return;
     }
 
-    connection.beginTransaction((err) => {
-      if (err) {
-        connection.release();
-        return res.status(500).json({ error: "Database error" });
-      }
+    const order = orderQuery[0];
+    const sampleMaterials = await query(
+      `SELECT om.*, sg.*
+      FROM order_material om
+      JOIN subgroup sg ON sg.id = om.subgroup
+      WHERE om.order_id = ?`,
+      [order.order_id]
+    );
 
-      connection.query(sqlQuery, [order_id], (err, results) => {
-        if (err) {
-          console.error("Database query error:", err);
-          connection.rollback(() => {
-            connection.release();
-            return res
-              .status(500)
-              .json({ error: "Database error", details: err });
-          });
-        }
+    const finalResult = await Promise.all(
+      sampleMaterials.map(async (eachSample) => {
+        const tests = await query(
+          "select mt.*,t.* from material_test mt join test t on t.id = mt.test_id where mt.sample_id = ?",
+          [eachSample.sample_id]
+        );
 
-        console.log("before");
-        console.log(results);
-        console.log("after");
-
-        results.forEach((row) => {
-          const order = {
-            order_id: row.order_id,
-            project_name: row.project_name,
-          };
-
-          const material = {
-            sample_id: row.sample_id,
-            subgroup: row.subgroup,
-          };
-
-          const test = {
-            test_id: row.test_id,
-          };
-
-          if (orderDetails[order.order_id]) {
-            orderDetails[order.order_id].materials.push(material);
-            orderDetails[order.order_id].materials.forEach((m) => {
-              if (m.sample_id === material.sample_id) {
-                m.tests.push(test);
-              }
-            });
-          } else {
-            orderDetails[order.order_id] = {
-              ...order,
-              materials: [material],
-            };
-            material.tests = [test];
-          }
-        });
-
-        const response = Object.values(orderDetails);
-
-        connection.commit((err) => {
-          if (err) {
-            connection.rollback(() => {
-              connection.release();
-              return res.status(500).json({ error: "Database error" });
-            });
-          }
-          connection.release();
-          res.json(response);
-        });
-      });
-    });
-  });
+        return {
+          ...eachSample,
+          tests,
+        };
+      })
+    );
+    res.status(200).json({ sampleData: finalResult, orderDetails: order });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 module.exports = router;
