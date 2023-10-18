@@ -155,14 +155,22 @@ async function insertOrUpdateMaterials(connection, orderData, orderId) {
 
   const materialResults = [];
   for (const material of materials) {
+    const { sampleId, subgroupId, materialSource, quantity, units } = material;
     const sqlQuery =
-      "INSERT INTO order_material (order_id, sample_id, subgroup) VALUES (?, ?, ?)";
-    const queryValues = [orderId, material.sampleId, material.subgroupId];
+      "INSERT INTO order_material (order_id, sample_id, subgroup,source,quantity,units) VALUES (?,?,?,?,?,?)";
+    const queryValues = [
+      orderId,
+      sampleId,
+      subgroupId,
+      materialSource,
+      quantity,
+      units,
+    ];
 
     const result = await util
       .promisify(connection.query)
       .call(connection, sqlQuery, queryValues);
-    materialResults.push(result); // Append the result to the array
+    materialResults.push(result);
   }
 
   return materialResults;
@@ -213,7 +221,6 @@ router.get("", (req, res) => {
       };
     });
 
-    console.log(formattedOrders);
     res.status(200).json(formattedOrders);
   });
 });
@@ -235,6 +242,11 @@ router.get("/:orderId", async (req, res) => {
     }
 
     const order = orderQuery[0];
+
+    const customerDetails = await query(`select * from customer where id = ?`, [
+      order.customer_id,
+    ]);
+
     const sampleMaterials = await query(
       `SELECT om.*, sg.*
       FROM order_material om
@@ -256,7 +268,11 @@ router.get("/:orderId", async (req, res) => {
         };
       })
     );
-    res.status(200).json({ sampleData: finalResult, orderDetails: order });
+    res.status(200).json({
+      samplesData: finalResult,
+      orderDetails: order,
+      customerDetails: customerDetails[0],
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
