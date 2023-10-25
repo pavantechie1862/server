@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const { createPool } = require("mysql");
 const router = express.Router();
+const verifyToken = require("./verifyToken");
 
 const pool = createPool({
   user: "root",
@@ -12,21 +13,24 @@ const pool = createPool({
   connectionLimit: 10,
   database: "lims",
 });
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-//get Employee's list
-router.get("", (req, res) => {
+router.get("", verifyToken, (req, res) => {
+  const username = req.payload;
+  console.log("username : " + username);
+  console.log("request");
+
   pool.query(`select * from customer`, (err, results) => {
     if (err) {
       res.status(500).json({ error: "Error fetching data" });
     } else {
-      res.json(results);
+      res.status(200).json(results);
     }
   });
 });
 
-//get single employee record
 router.get("/get/:id", (req, res) => {
   const { id } = req.params;
   const getEmployeeByIdQuery = `
@@ -47,7 +51,6 @@ router.get("/get/:id", (req, res) => {
 });
 
 function saveOrUpdateCustomer(req, res, id) {
-  console.log(id);
   const customerData = {
     customer_id: req.body.customer_id,
     reporting_name: req.body.reporting_name,
@@ -133,18 +136,15 @@ function saveOrUpdateCustomer(req, res, id) {
   });
 }
 
-// API route for adding a new customer
 router.post("/add", upload.none(), (req, res) => {
   saveOrUpdateCustomer(req, res);
 });
 
-// API route for updating an existing customer by ID
 router.put("/update/:id", upload.none(), (req, res) => {
   const id = req.params.id;
   saveOrUpdateCustomer(req, res, id);
 });
 
-//API to delete a customer's record
 router.delete("/delete/:customer_id", (req, res) => {
   const customer_id = req.params.customer_id;
   const deleteCustomerQuery = "DELETE FROM Customer WHERE customer_id = ?";

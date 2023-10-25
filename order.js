@@ -6,6 +6,7 @@ const { createPool } = require("mysql");
 const util = require("util");
 
 const { PENDING_FOR_REVIEW } = require("./constants");
+const verifyToken = require("./verifyToken");
 
 const router = express.Router();
 
@@ -152,7 +153,6 @@ async function insertOrUpdateOrder(connection, orderData, file, id) {
 
 async function insertOrUpdateMaterials(connection, orderData, orderId) {
   const materials = JSON.parse(orderData.testData);
-
   const materialResults = [];
   for (const material of materials) {
     const { sampleId, subgroupId, materialSource, quantity, units } = material;
@@ -228,7 +228,7 @@ router.get("", (req, res) => {
 const query = util.promisify(pool.query).bind(pool);
 
 // Route to get order by ID with material and test details
-router.get("/:orderId", async (req, res) => {
+router.get("/:orderId", verifyToken, async (req, res) => {
   const orderId = req.params.orderId;
 
   try {
@@ -255,6 +255,11 @@ router.get("/:orderId", async (req, res) => {
       [order.order_id]
     );
 
+    const staffData = await query(
+      `select CONCAT(emp.first_name, ' ', emp.last_name) AS name,emp.emp_id,dept.dept_id from department dept join employee emp on emp.department = dept.dept_id where dept_id in (?,?)`,
+      ["LABORATORY_CHEMICAL", "LABORATORY_MECHANICAL"]
+    );
+
     const finalResult = await Promise.all(
       sampleMaterials.map(async (eachSample) => {
         const tests = await query(
@@ -268,11 +273,44 @@ router.get("/:orderId", async (req, res) => {
         };
       })
     );
-    res.status(200).json({
-      samplesData: finalResult,
-      orderDetails: order,
-      customerDetails: customerDetails[0],
-    });
+
+    if (req.user.username === "BhuvanagiriEMP1006") {
+      const filteredChemical = finalResult.map((result) => {
+        result.tests = result.tests.filter(
+          (test) => test.discipline === "CHEMICAL"
+        );
+        return result;
+      });
+      res.status(200).json({
+        samples: filteredChemical,
+        staffData: staffData,
+        orderDetails: order,
+        customerDetails: customerDetails[0],
+      });
+    } else if (req.user.username === "NotmentionedEMP6001") {
+      const filteredPhysical = finalResult.map((result) => {
+        result.tests = result.tests.filter(
+          (test) => test.discipline === "PHYSICAL"
+        );
+        return result;
+      });
+      res.status(200).json({
+        samples: filteredPhysical,
+        staffData: staffData,
+        orderDetails: order,
+        customerDetails: customerDetails[0],
+      });
+    } else if (req.user.username === "UnknownEMP0188") {
+      res.status(200).json({
+        samples: finalResult,
+        staffData: staffData,
+        orderDetails: order,
+        customerDetails: customerDetails[0],
+      });
+    } else {
+      console.log("not authorised");
+      res.status(500).json({ error: "Not Authorised" });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

@@ -2,8 +2,11 @@ const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const { createPool } = require("mysql");
 const router = express.Router();
+const { KDM_ACCESS_TOKEN } = require("./constants");
 
 const pool = createPool({
   user: "root",
@@ -12,6 +15,7 @@ const pool = createPool({
   connectionLimit: 10,
   database: "lims",
 });
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -47,7 +51,7 @@ const employeeDocuments = upload.fields([
   { name: "degree_certificate", maxCount: 1 },
 ]);
 
-router.post("/add", employeeDocuments, (request, res) => {
+router.post("/add", employeeDocuments, async (request, res) => {
   if (!checkRequiredFiles(request, res)) {
     return res.status(400).json({ error_msg: "One or more files are missing" });
   }
@@ -74,7 +78,9 @@ router.post("/add", employeeDocuments, (request, res) => {
   const appointed_date = request.body.appointed_date;
   const salary = request.body.salary;
   const branch = request.body.branch;
-  const supervisor = request.body.supervisor;
+  const supervisor = request.body.supervisor || null;
+  const password = last_name + emp_id;
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   const uploadDestination = path.join(__dirname, "public", "employee", emp_id);
   if (!fs.existsSync(uploadDestination)) {
@@ -171,8 +177,10 @@ router.post("/add", employeeDocuments, (request, res) => {
     appointed_date,
     salary,
     branch,
-    supervisor
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    supervisor,
+    hashed_password,
+    username
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)`;
 
   pool.query(
     insertDocumentsQuery,
@@ -199,14 +207,23 @@ router.post("/add", employeeDocuments, (request, res) => {
       salary,
       branch,
       supervisor,
+      hashedPassword,
+      last_name + emp_id,
     ],
+
     (err, result) => {
       if (err) {
-        res.status(500).json({ error_msg: "Internal server error" });
+        console.log(err);
+        res.status(500).json({ error_msg: "Internal server error", err });
       } else {
-        res
-          .status(200)
-          .json({ message: "Employee and documents added successfully" });
+        const payload = {
+          username: last_name + emp_id,
+        };
+        const jwtToken = jwt.sign(payload, KDM_ACCESS_TOKEN);
+        res.status(200).json({
+          message: "Employee and documents added successfully",
+          jwtToken,
+        });
       }
     }
   );
@@ -356,9 +373,7 @@ router.get("/get/:id", (req, res) => {
   `;
 
   pool.query(getEmployeeByIdQuery, (err, result) => {
-    console.log("get single record triggered");
     if (err) {
-      console.error("Error fetching employee data:", err);
       res.status(500).json({ error: "Error fetching employee data" });
     } else {
       if (result.length > 0) {
@@ -370,7 +385,25 @@ router.get("/get/:id", (req, res) => {
   });
 });
 
-// Update an existing employee
+router.get("/get/:id", (req, res) => {
+  const { id } = req.params;
+  const getEmployeeByIdQuery = `
+    SELECT * FROM Employee WHERE emp_id = '${id}'
+  `;
+
+  pool.query(getEmployeeByIdQuery, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: "Error fetching employee data" });
+    } else {
+      if (result.length > 0) {
+        res.status(200).json(result[0]);
+      } else {
+        res.status(404).json({ error: "Employee not found" });
+      }
+    }
+  });
+});
+
 router.put("/update/:id", (req, res) => {
   console.log("update single record triggered");
   const { id } = req.params;
@@ -430,5 +463,42 @@ router.delete("/delete/:id", (req, res) => {
     }
   });
 });
+
+router.get("/staff-dept-role", async (request, response) => {
+  try {
+    const staffQuery =
+      "SELECT emp_id, department, first_name , last_name,role FROM employee";
+    const departmentQuery = "SELECT dept_id,department FROM department";
+    const roleQuery = "SELECT role_id,role,department FROM role";
+    const branchQuery = "select branch_id,branch from branch";
+
+    const staffData = await executeQuery(staffQuery);
+    const departmentData = await executeQuery(departmentQuery);
+    const roleData = await executeQuery(roleQuery);
+    const branchData = await executeQuery(branchQuery);
+
+    const responseData = {
+      staff: staffData,
+      departments: departmentData,
+      roles: roleData,
+      branches: branchData,
+    };
+    response.status(200).json(responseData);
+  } catch (error) {
+    response.status(500).json("Failed to fetch data");
+  }
+});
+
+function executeQuery(query) {
+  return new Promise((resolve, reject) => {
+    pool.query(query, (err, result) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}
 
 module.exports = router;

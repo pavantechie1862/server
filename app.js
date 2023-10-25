@@ -12,6 +12,7 @@ const groups = require("./materialGroups");
 const subgroup = require("./subGroup");
 const test = require("./tests");
 const order = require("./order");
+const authRoute = require("./auth");
 
 app.use("/employee", employeeRoutes);
 app.use("/customer", customerRoutes);
@@ -19,6 +20,7 @@ app.use("/group", groups);
 app.use("/subgroup", subgroup);
 app.use("/test", test);
 app.use("/order", order);
+app.use("/auth", authRoute);
 
 app.listen(8081, () => {
   console.log("Server started on port 8081");
