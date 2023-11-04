@@ -8,7 +8,6 @@ function verifyToken(request, response, next) {
     jwtToken = authHeader.split(" ")[1];
   }
   if (jwtToken === undefined) {
-    console.log("jwt key is undefined");
     response.status(400).json({ jwt_token: "No jwt token" });
   } else {
     jwt.verify(jwtToken, KDM_ACCESS_TOKEN, async (error, payload) => {
@@ -18,7 +17,7 @@ function verifyToken(request, response, next) {
         response.status(400).json({ jwt_token: "Invalid JWT Token" });
       } else {
         request.user = payload;
-        console.log(request.user);
+
         next();
       }
     });

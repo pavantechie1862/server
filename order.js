@@ -60,6 +60,42 @@ async function saveOrUpdateOrder(req, res, id) {
   }
 }
 
+router.post("/assign/:orderId", upload.none(), async (request, response) => {
+  const orderId = request.params.orderId;
+  const data = request.body;
+  const payload = JSON.parse(data.payload);
+
+  const connection = await util.promisify(pool.getConnection).call(pool);
+  try {
+    await util.promisify(connection.beginTransaction).call(connection);
+    const sqlQuery = `update orders set status = ?,assigned_on=? where order_id = ?`;
+    await util
+      .promisify(connection.query)
+      .call(connection, sqlQuery, ["ASSIGNED", new Date(), orderId]);
+
+    for (const obj of payload) {
+      const { sample, test, employee } = obj;
+      const sql = `UPDATE material_test SET assign_to = ?,status = ? WHERE sample_id = ? AND test_id = ?`;
+      const values = [employee, "IN_PROGRESS", sample, test];
+
+      await new Promise((resolve, reject) => {
+        connection.query(sql, values, (err, results) => {
+          if (err) reject(err);
+          resolve(results);
+        });
+      });
+    }
+
+    await util.promisify(connection.commit).call(connection);
+    connection.release();
+    response.status(200).json({ message: "Jobs created successfully" });
+  } catch (error) {
+    await util.promisify(connection.rollback).call(connection);
+    connection.release();
+    res.status(500).json({ error_msg: "Internal server error" });
+  }
+});
+
 async function insertOrUpdateOrder(connection, orderData, file, id) {
   const {
     order_id,
@@ -204,7 +240,7 @@ router.put("/update/:id", upload.single("letter"), (req, res) => {
 
 router.get("", (req, res) => {
   const sqlQuery = `
-    SELECT * FROM orders
+    SELECT * FROM orders order by due_date asc
   `;
   pool.query(sqlQuery, (err, results) => {
     if (err) {
@@ -228,7 +264,7 @@ router.get("", (req, res) => {
 const query = util.promisify(pool.query).bind(pool);
 
 // Route to get order by ID with material and test details
-router.get("/:orderId", verifyToken, async (req, res) => {
+router.get("/:orderId", async (req, res) => {
   const orderId = req.params.orderId;
 
   try {
@@ -248,7 +284,7 @@ router.get("/:orderId", verifyToken, async (req, res) => {
     ]);
 
     const sampleMaterials = await query(
-      `SELECT om.*, sg.*
+      `SELECT  om.sample_id,sg.name as sampleName
       FROM order_material om
       JOIN subgroup sg ON sg.id = om.subgroup
       WHERE om.order_id = ?`,
@@ -256,61 +292,34 @@ router.get("/:orderId", verifyToken, async (req, res) => {
     );
 
     const staffData = await query(
-      `select CONCAT(emp.first_name, ' ', emp.last_name) AS name,emp.emp_id,dept.dept_id from department dept join employee emp on emp.department = dept.dept_id where dept_id in (?,?)`,
+      `select CONCAT(emp.first_name, ' ', emp.last_name) AS name,emp.emp_id,dept.dept_id,profile_image as profile from department dept join employee emp on emp.department = dept.dept_id where dept_id in (?,?)`,
       ["LABORATORY_CHEMICAL", "LABORATORY_MECHANICAL"]
     );
 
     const finalResult = await Promise.all(
       sampleMaterials.map(async (eachSample) => {
+        const beforeAssign =
+          "select  mt.test_id,mt.status,mt.assign_to as assignedTo ,t.test_name as testName,t.discipline from material_test mt join test t on t.id = mt.test_id where mt.sample_id = ?";
+        const afterAssign =
+          "select mt.test_id,mt.status,mt.assign_to as assignedTo ,t.test_name as testName,t.discipline,e.profile_image as empImage from material_test mt join test t on t.id = mt.test_id join employee e on e.emp_id = mt.assign_to   where mt.sample_id = ?";
         const tests = await query(
-          "select mt.*,t.* from material_test mt join test t on t.id = mt.test_id where mt.sample_id = ?",
+          order.status === "ASSIGNED" ? afterAssign : beforeAssign,
           [eachSample.sample_id]
         );
 
         return {
           ...eachSample,
-          tests,
+          jobs: tests,
         };
       })
     );
 
-    if (req.user.username === "BhuvanagiriEMP1006") {
-      const filteredChemical = finalResult.map((result) => {
-        result.tests = result.tests.filter(
-          (test) => test.discipline === "CHEMICAL"
-        );
-        return result;
-      });
-      res.status(200).json({
-        samples: filteredChemical,
-        staffData: staffData,
-        orderDetails: order,
-        customerDetails: customerDetails[0],
-      });
-    } else if (req.user.username === "NotmentionedEMP6001") {
-      const filteredPhysical = finalResult.map((result) => {
-        result.tests = result.tests.filter(
-          (test) => test.discipline === "PHYSICAL"
-        );
-        return result;
-      });
-      res.status(200).json({
-        samples: filteredPhysical,
-        staffData: staffData,
-        orderDetails: order,
-        customerDetails: customerDetails[0],
-      });
-    } else if (req.user.username === "UnknownEMP0188") {
-      res.status(200).json({
-        samples: finalResult,
-        staffData: staffData,
-        orderDetails: order,
-        customerDetails: customerDetails[0],
-      });
-    } else {
-      console.log("not authorised");
-      res.status(500).json({ error: "Not Authorised" });
-    }
+    res.status(200).json({
+      samples: finalResult,
+      staffData: staffData,
+      orderDetails: order,
+      customerDetails: customerDetails[0],
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

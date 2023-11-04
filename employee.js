@@ -52,18 +52,18 @@ const employeeDocuments = upload.fields([
 ]);
 
 router.post("/add", employeeDocuments, async (request, res) => {
-  if (!checkRequiredFiles(request, res)) {
-    return res.status(400).json({ error_msg: "One or more files are missing" });
-  }
+  // if (!checkRequiredFiles(request, res)) {
+  //   return res.status(400).json({ error_msg: "One or more files are missing" });
+  // }
 
   const profile_image = request.files["profile_image"][0];
-  const adhar = request.files["adhar"][0];
-  const pan = request.files["pan"][0];
-  const bank_account = request.files["bank_account"][0];
-  const appointment_letter = request.files["appointment_letter"][0];
-  const ssc_certificate = request.files["ssc_certificate"][0];
-  const intermediate_certificate = request.files["intermediate_certificate"][0];
-  const degree_certificate = request.files["degree_certificate"][0];
+  // const adhar = request.files["adhar"][0];
+  // const pan = request.files["pan"][0];
+  // const bank_account = request.files["bank_account"][0];
+  // const appointment_letter = request.files["appointment_letter"][0];
+  // const ssc_certificate = request.files["ssc_certificate"][0];
+  // const intermediate_certificate = request.files["intermediate_certificate"][0];
+  // const degree_certificate = request.files["degree_certificate"][0];
 
   const emp_id = request.body.emp_id;
   const first_name = request.body.first_name;
@@ -76,7 +76,7 @@ router.post("/add", employeeDocuments, async (request, res) => {
   const department = request.body.department;
   const role = request.body.role;
   const appointed_date = request.body.appointed_date;
-  const salary = request.body.salary;
+  const salary = request.body.salary ? request.body.salary : 0;
   const branch = request.body.branch;
   const supervisor = request.body.supervisor || null;
   const password = last_name + emp_id;
@@ -120,39 +120,39 @@ router.post("/add", employeeDocuments, async (request, res) => {
     emp_id
   );
 
-  const adharFilePath = saveFileAndReturnRelativePath(adhar, "adhar", emp_id);
+  // const adharFilePath = saveFileAndReturnRelativePath(adhar, "adhar", emp_id);
 
-  const panFilePath = saveFileAndReturnRelativePath(pan, "pan", emp_id);
+  // const panFilePath = saveFileAndReturnRelativePath(pan, "pan", emp_id);
 
-  const bankAccountFilePath = saveFileAndReturnRelativePath(
-    bank_account,
-    "bank_account",
-    emp_id
-  );
+  // const bankAccountFilePath = saveFileAndReturnRelativePath(
+  //   bank_account,
+  //   "bank_account",
+  //   emp_id
+  // );
 
-  const appointmentFilePath = saveFileAndReturnRelativePath(
-    appointment_letter,
-    "appointment_letter",
-    emp_id
-  );
+  // const appointmentFilePath = saveFileAndReturnRelativePath(
+  //   appointment_letter,
+  //   "appointment_letter",
+  //   emp_id
+  // );
 
-  const sscFilePath = saveFileAndReturnRelativePath(
-    ssc_certificate,
-    "ssc_certificate",
-    emp_id
-  );
+  // const sscFilePath = saveFileAndReturnRelativePath(
+  //   ssc_certificate,
+  //   "ssc_certificate",
+  //   emp_id
+  // );
 
-  const intermediateFilePath = saveFileAndReturnRelativePath(
-    intermediate_certificate,
-    "intermediate_certificate",
-    emp_id
-  );
+  // const intermediateFilePath = saveFileAndReturnRelativePath(
+  //   intermediate_certificate,
+  //   "intermediate_certificate",
+  //   emp_id
+  // );
 
-  const degreeFilePath = saveFileAndReturnRelativePath(
-    degree_certificate,
-    "degree_certificate",
-    emp_id
-  );
+  // const degreeFilePath = saveFileAndReturnRelativePath(
+  //   degree_certificate,
+  //   "degree_certificate",
+  //   emp_id
+  // );
 
   const insertDocumentsQuery = `
   INSERT INTO Employee (
@@ -187,13 +187,20 @@ router.post("/add", employeeDocuments, async (request, res) => {
     [
       emp_id,
       profileImagePath,
-      adharFilePath,
-      panFilePath,
-      bankAccountFilePath,
-      appointmentFilePath,
-      sscFilePath,
-      intermediateFilePath,
-      degreeFilePath,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      // adharFilePath,
+      // panFilePath,
+      // bankAccountFilePath,
+      // appointmentFilePath,
+      // sscFilePath,
+      // intermediateFilePath,
+      // degreeFilePath,
       first_name,
       last_name,
       dob,
@@ -355,44 +362,81 @@ router.put("/update/:id", upload.none(), (request, res) => {
 
 //get Employee's list
 router.get("", (req, res) => {
-  pool.query(`select * from employee`, (err, results) => {
+  const employeeQuery = `select * from employee e join role r on e.role = r.role_id join department d on d.dept_id = e.department`;
+  pool.query(employeeQuery, (err, results) => {
     if (err) {
       console.error("Error fetching data: " + err.message);
       res.status(500).json({ error: "Error fetching data" });
     } else {
-      res.json(results);
+      console.log(results);
+      const formattedResult = results.map((eachEmployee) => {
+        return {
+          emp_id: eachEmployee.emp_id,
+          name: eachEmployee.first_name + " " + eachEmployee.last_name,
+          department_designation:
+            eachEmployee.department + " - " + eachEmployee.role,
+          contact: eachEmployee.mobile,
+          email: eachEmployee.personnel_mail,
+          profile_url: eachEmployee.profile_image,
+        };
+      });
+      console.log(formattedResult);
+      res.json(formattedResult);
     }
   });
 });
 
 //get single employee record
+// router.get("/get/:id", (req, res) => {
+//   const { id } = req.params;
+//   const getEmployeeByIdQuery = `
+//     SELECT * FROM Employee WHERE emp_id = '${id}'
+//   `;
+
+//   pool.query(getEmployeeByIdQuery, (err, result) => {
+//     if (err) {
+//       res.status(500).json({ error: "Error fetching employee data" });
+//     } else {
+//       if (result.length > 0) {
+//         res.status(200).json(result[0]);
+//       } else {
+//         res.status(404).json({ error: "Employee not found" });
+//       }
+//     }
+//   });
+// });
+
 router.get("/get/:id", (req, res) => {
   const { id } = req.params;
-  const getEmployeeByIdQuery = `
-    SELECT * FROM Employee WHERE emp_id = '${id}'
-  `;
 
-  pool.query(getEmployeeByIdQuery, (err, result) => {
+  const getEmployeeQuery = `SELECT
+      CONCAT(e.first_name, ' ', e.last_name) AS emp_name,e.emp_id,e.mobile,e.personnel_mail AS email, e.address, e.additional_info,
+        e.appointed_date,
+        e.dob,
+        e.salary,
+        b.branch,
+        CONCAT(s.first_name, ' ', s.last_name) AS supervisor,
+        s.emp_id as supervisor_id,
+        e.profile_image as profile_pic,
+        s.profile_image as supervisor_pic,
+        d.department as dept,
+        r.role as role
+      FROM
+        employee e
+      JOIN
+        role r ON e.role = r.role_id
+      JOIN
+        department d ON d.dept_id = e.department
+      JOIN
+        branch b ON b.branch_id = e.branch
+      LEFT JOIN
+        employee s ON s.emp_id = e.supervisor
+      WHERE
+        e.emp_id = '${id}';`;
+
+  pool.query(getEmployeeQuery, (err, result) => {
     if (err) {
-      res.status(500).json({ error: "Error fetching employee data" });
-    } else {
-      if (result.length > 0) {
-        res.status(200).json(result[0]);
-      } else {
-        res.status(404).json({ error: "Employee not found" });
-      }
-    }
-  });
-});
-
-router.get("/get/:id", (req, res) => {
-  const { id } = req.params;
-  const getEmployeeByIdQuery = `
-    SELECT * FROM Employee WHERE emp_id = '${id}'
-  `;
-
-  pool.query(getEmployeeByIdQuery, (err, result) => {
-    if (err) {
+      console.log(err);
       res.status(500).json({ error: "Error fetching employee data" });
     } else {
       if (result.length > 0) {

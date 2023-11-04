@@ -17,11 +17,7 @@ const pool = createPool({
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.get("", verifyToken, (req, res) => {
-  const username = req.payload;
-  console.log("username : " + username);
-  console.log("request");
-
+router.get("", (req, res) => {
   pool.query(`select * from customer`, (err, results) => {
     if (err) {
       res.status(500).json({ error: "Error fetching data" });
@@ -125,6 +121,7 @@ function saveOrUpdateCustomer(req, res, id) {
 
   pool.query(sqlQuery, queryValues, (err, result) => {
     if (err) {
+      console.log(err);
       res.status(500).json({ error_msg: "Internal server error" });
     } else {
       if (id) {
