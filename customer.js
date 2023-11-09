@@ -64,7 +64,6 @@ function saveOrUpdateCustomer(req, res, id) {
   let queryValues;
 
   if (id === undefined) {
-    console.log(" add form ");
     sqlQuery = `
       INSERT INTO Customer (
         customer_id,
@@ -91,7 +90,6 @@ function saveOrUpdateCustomer(req, res, id) {
       customerData.work_order,
     ];
   } else {
-    console.log("edit form");
     sqlQuery = `
       UPDATE customer
       SET

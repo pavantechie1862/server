@@ -25,9 +25,11 @@ router.post("/submit/:jobId", upload.none(), (request, response) => {
   const queryValues = [new Date(), value, result, jobId];
   pool.query(sqlQuery, queryValues, (err, result) => {
     if (err) {
+      console.log(err);
       response.status(500).send({ err_message: "Internal server error" });
+    } else {
+      response.status(200).send({ message: "jobs submitted successfully" });
     }
-    response.status(200).send({ message: "jobs submitted successfully" });
   });
 });
 
@@ -56,6 +58,7 @@ router.get("/myJobs/:sId/:tId", verifyToken, async (request, response) => {
     response.status(200).json(jobs[0]);
   } catch (err) {
     console.log(err);
+    response.status(500).json({ err_message: "Internal server error" });
   }
 });
 
@@ -64,7 +67,6 @@ router.get("/myJobs", verifyToken, async (request, response) => {
 
   try {
     const connection = await util.promisify(pool.getConnection).call(pool);
-
     await util.promisify(connection.beginTransaction).call(connection);
 
     const empIdQuery = "SELECT emp_id FROM employee WHERE username = ?";

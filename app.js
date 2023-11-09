@@ -7,6 +7,7 @@ app.use("/public", express.static(path.join(__dirname, "public")));
 app.use(cors());
 
 const employeeRoutes = require("./employee");
+// const roles = require("./roles");
 const customerRoutes = require("./customer");
 const groups = require("./materialGroups");
 const subgroup = require("./subGroup");
@@ -23,6 +24,7 @@ app.use("/test", test);
 app.use("/order", order);
 app.use("/auth", authRoute);
 app.use("/jobs", jobs);
+// app.use("/roles", roles);
 
 app.listen(8081, () => {
   console.log("Server started on port 8081");

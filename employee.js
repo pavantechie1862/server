@@ -368,7 +368,6 @@ router.get("", (req, res) => {
       console.error("Error fetching data: " + err.message);
       res.status(500).json({ error: "Error fetching data" });
     } else {
-      console.log(results);
       const formattedResult = results.map((eachEmployee) => {
         return {
           emp_id: eachEmployee.emp_id,
@@ -380,7 +379,6 @@ router.get("", (req, res) => {
           profile_url: eachEmployee.profile_image,
         };
       });
-      console.log(formattedResult);
       res.json(formattedResult);
     }
   });
@@ -449,7 +447,6 @@ router.get("/get/:id", (req, res) => {
 });
 
 router.put("/update/:id", (req, res) => {
-  console.log("update single record triggered");
   const { id } = req.params;
   const updatedEmployee = req.body;
 
